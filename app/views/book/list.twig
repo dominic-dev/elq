@@ -1,0 +1,11 @@
+<h1>Books:list</h1>
+
+{% for book in books %}
+    <p>{{ book.title }}</p>
+    {% if book.author %}
+    <p>
+        {{ book.author.first_name }}
+        {{ book.author.last_name }}
+    <p>
+    {% endif %}
+{% endfor %}

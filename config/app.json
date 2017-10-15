@@ -1,0 +1,8 @@
+{
+    "environment" : "development",
+
+    "db-development":{
+        "driver" : "sqlite",
+		"database" : "database.sqlite3"
+    }
+}

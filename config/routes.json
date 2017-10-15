@@ -1,0 +1,38 @@
+{
+    "books/:id" : {
+        "controller" : "Book",
+        "method" : "show",
+        "params" : {
+            "id" : "int"
+        }
+    },
+
+    "books/list" : {
+        "controller" : "Book",
+        "method" : "list"
+    },
+
+    "books/search/:query" : {
+        "controller" : "Book",
+        "method" : "search",
+        "params" : {
+            "query" : "str"
+        }
+
+    },
+
+    "authors/list" : {
+        "controller" : "Author",
+        "method" : "list"
+    },
+
+    "authors/:id" : {
+        "controller" : "Author",
+        "method" : "show",
+        "params" : {
+            "id" : "int"
+        }
+
+    }
+
+}
