@@ -31,34 +31,48 @@ class Router{
             if (preg_match($pattern, $path)){
                 // Extract params from uri.
                 $uri_params = $this->extractParams($route, $path);
-                return $this->executeController($route, $info, $request, $uri_params);
+                return $this->executeController($info, $request, $uri_params);
             }
 
         }
     }
 
     /**
-     * Extract the paramaters from path.
+     * Extract the paramaters from URI.
+     *
+     * @param route (string) the route pattern from condig/routes.json
+     * @param path (string) the URI
+     *
      * @return $params (array) The paramaters as key => value pairs.
      */
     
     private function extractParams(string $route, string $path){
-        str_replace('\\', '', $route);
+        //str_replace('\\', '', $route);
+        // Compare the matched route pattern to the URI
+        // e.g. books/:id to /books/1
+        // Remove trailing and leading slashes and split by remaining slashes.
         $keys = explode('/', trim($route, '/'));
         $values = explode('/', trim($path, '/'));
+        // Combine both arrays as key => value pairs.
+        // And reduce the array to parameter matches e.g. id => 1 (without leading :)
         $params = array_combine($keys, $values);
         foreach ($params as $key => $value){
-            // Filter paramaters.
             if (strpos($key, ':') === 0 ){
                 $params[trim($key, ':')] = $value;
             }
             unset($params[$key]);
         }
         return $params;
-
     }
 
-    private function executeController(string $route, array $info, Request $request, array $uri_params=null){
+    /**
+     * Execute controller.
+     *
+     * @param request (Request) the request object.
+     * @param uri_params (array) The paramaters extracted from URI.
+     */
+    
+    private function executeController(array $info, Request $request, array $uri_params=null){
         $controller_name = 'Elastique\App\\' . $info['controller'] . 'Controller';
         $method = $info['method'];
 
@@ -71,6 +85,7 @@ class Router{
      *
      * @param $route (string) the routing pattern as it appears in configuration.
      * @param $params (array) the params appearing in this pattern.
+     *
      * @return (string) regex pattern.
      */
     
