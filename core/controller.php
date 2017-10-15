@@ -29,10 +29,10 @@ class Controller{
      * Render view.
      *
      * @param $template (string) the template to render.
-     * @param $params (array) the paramaters to pass to render.
+     * @param $params (array) the paramaters to pass to render. Optional.
      * @param directory (str) the directory to search in. Optional.
      */
-    protected function render(string $template, array $params, $directory=null) : string {
+    protected function render(string $template, array $params=[], $directory=null) : string {
         // Render searches by default in the views/<model name>/ directory
         if(!isset($directory)){
             $directory = str_replace('controller', '', $this->parsed_classname['short_lower']);

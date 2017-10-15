@@ -5,7 +5,7 @@ namespace Elastique\Core;
 class Router{
     private static $patterns = [
         'int' => '\d',
-        'str' => '\w'
+        'str' => '[A-Za-z\-]+'
     ];
 
     public function __construct(){
@@ -20,12 +20,13 @@ class Router{
      */
     
     public function route(Request $request): string{
+        $path = $request->getPath();
         foreach ($this->routes as $route => $info){
             // Does route have paramaters?
             $route_params = isset($info['params']) ? $info['params'] : null;
             // Get rexeg pattern
             $pattern = $this->getPattern($route, $route_params);
-            $path = $request->getPath();
+            //$path = $request->getPath();
 
             if (preg_match($pattern, $path)){
                 // Extract params from uri.
@@ -57,7 +58,7 @@ class Router{
 
     }
 
-    private function executeController(string $route, array $info, Request $request, $uri_params=null){
+    private function executeController(string $route, array $info, Request $request, array $uri_params=null){
         $controller_name = 'Elastique\App\\' . $info['controller'] . 'Controller';
         $method = $info['method'];
 
@@ -73,7 +74,7 @@ class Router{
      * @return (string) regex pattern.
      */
     
-    private function getPattern(string $route, $route_params=null): string {
+    private function getPattern(string $route, array $route_params=null): string {
         // Escape slashes.
         $route = str_replace('/', '\/', $route);
 

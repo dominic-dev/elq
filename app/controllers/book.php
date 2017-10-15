@@ -12,7 +12,21 @@ class BookController extends Controller{
 
     }
 
-    public function search(string $query){
+    public function featured(){
+        $books = $this->model->getFeatured();
+        $params = ['books' => $books];
+        return $this->render('list', $params);
+        
+    }
+
+    public function search(string $query=null, int $offset=null, int $limit=null){
+        // Render form.
+        if ($query == null){
+            return $this->render('search');
+        }
+
+
+        // Render results.
         // Split query by '-'
         $keywords = explode('-', $query);
 
@@ -22,7 +36,13 @@ class BookController extends Controller{
             $result += $this->model->search($value);
         }
 
-        // Render
+        if(isset($offset)){
+            $result = array_slice($result, $offset);
+        }
+        if(isset($limit)){
+            $result = array_slice($result, 0, $limit);
+        }
+
         $params = ['books' => $result];
         return $this->render('list', $params);
     }

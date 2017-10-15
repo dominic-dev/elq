@@ -7,12 +7,37 @@
         }
     },
 
+    "books/highlighted" : {
+        "controller" : "Book",
+        "method" : "featured"
+    },
+
     "books/list" : {
         "controller" : "Book",
         "method" : "list"
     },
 
+    "books/search/:query/:offset/:limit" : {
+        "controller" : "Book",
+        "method" : "search",
+        "params" : {
+            "query" : "str",
+            "offset" : "int",
+            "limit" : "int"
+        }
+
+    },
+
     "books/search/:query" : {
+        "controller" : "Book",
+        "method" : "search",
+        "params" : {
+            "query" : "str"
+        }
+
+    },
+
+    "books/search" : {
         "controller" : "Book",
         "method" : "search",
         "params" : {
@@ -28,6 +53,20 @@
 
     "authors/:id" : {
         "controller" : "Author",
+        "method" : "show",
+        "params" : {
+            "id" : "int"
+        }
+
+    },
+
+    "publishers/list" : {
+        "controller" : "Publisher",
+        "method" : "list"
+    },
+
+    "publishers/:id" : {
+        "controller" : "Publisher",
         "method" : "show",
         "params" : {
             "id" : "int"

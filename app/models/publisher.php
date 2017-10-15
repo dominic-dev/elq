@@ -8,30 +8,29 @@ use Elastique\Core\Exceptions\NotFound;
 
 use PDO;
 
-class Author extends Model{
+class Publisher extends Model{
     public $id;
-    public $first_name;
-    public $last_name;
+    public $name;
 
     public function __construct() {
         parent::__construct(self::class);
     }
 
     public function get($id){
-        $query = 'select * from authors where author_id = :id';
+        $query = 'select * from publishers where publisher_id = :id';
         $sth = $this->db->prepare($query);
         $sth->bindParam('id', $id, PDO::PARAM_INT);
         $sth->execute();
         $data = $sth->fetch();
         if ($data == false){
-            throw new NotFound('Author not found.');
+            throw new NotFound('Publisher not found.');
         }
         return $this->factory($data);
     }
 
     public function getAll() : array {
         $query = <<<SQL
-select * from authors 
+select * from publishers 
 SQL;
         $sth = $this->db->prepare($query);
         $sth->execute();
@@ -43,6 +42,7 @@ SQL;
         }
         return $array;
     }
+
     public function new($data){
         return $this->factory($data);
     }
@@ -58,30 +58,27 @@ SQL;
 
     private function create(){
         $query = <<<SQL
-insert into authors (first_name, last_name)
-values (:first_name, :last_name)
+insert into publishers (name)
+values (:name)
 SQL;
         $sth = $this->db->prepare($query);
-        $sth->bindValue('first_name', $this->first_name);
-        $sth->bindValue('last_name', $this->last_name);
+        $sth->bindValue('name', $this->name);
         $sth->execute();
     }
 
     private function factory($data){
-        $obj = new Author();
-        $obj->id = $data['author_id'];
-        $obj->first_name = $data['first_name'];
-        $obj->last_name = $data['last_name'];
+        $obj = new Publisher();
+        $obj->id = $data['publisher_id'];
+        $obj->name = $data['name'];
         return $obj;
     }
 
     private function update(){
         $query = <<<SQL
-update authors set first_name = :first_name, last_name = :last_name where author_id = :id
+update publishers set name = :name where publisher_id = :id
 SQL;
         $sth = $this->db->prepare($query);
-        $sth->bindValue('first_name', $this->first_name);
-        $sth->bindValue('last_name', $this->last_name);
+        $sth->bindValue('name', $this->name);
         $sth->bindValue('id', $this->id);
         $sth->execute();    
     }
