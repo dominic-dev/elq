@@ -3,6 +3,7 @@
 namespace Elastique\Core;
 
 use Elastique\Core\Database;
+use Elastique\Core\Config;
 
 use PDO;
 use APCUIterator;
@@ -56,7 +57,7 @@ abstract class Model{
     
     public function fetchAll(string $query, array $options=null){
         $cache_key = $this->short_classname . md5($query);
-        if (apcu_exists($cache_key)){
+        if (apcu_exists($cache_key) && Config::get('cache') == 1){
             return apcu_fetch($cache_key);
         }
         $sth = $this->db->prepareStatement($query, $options);

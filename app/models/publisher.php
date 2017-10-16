@@ -26,7 +26,7 @@ class Publisher extends Model{
         $query = <<<SQL
 select * from publishers 
 SQL;
-        return $this->fetchAll();
+        return $this->fetchAll($query);
     }
 
     public function new($data){

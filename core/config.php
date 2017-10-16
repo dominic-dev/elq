@@ -1,6 +1,8 @@
 <?php
 namespace Elastique\Core;
 
+use Elastique\Core\Exceptions\NotFound;
+
 /**
  * Config. Singleton.
  */
