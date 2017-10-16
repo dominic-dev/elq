@@ -3,6 +3,9 @@
 namespace Elastique\Core;
 
 class Router{
+    private $routes;
+    private $configuredParams;
+
     private static $patterns = [
         'int' => '\d',
         'str' => '[A-Za-z\-]+'
@@ -11,6 +14,7 @@ class Router{
     public function __construct(){
         $json = file_get_contents(__DIR__ . '/../config/routes.json');
         $this->routes = json_decode($json, true);
+        $this->configured_params = $this->getConfiguredParams();
     }
 
     /**
@@ -33,7 +37,6 @@ class Router{
                 $uri_params = $this->extractParams($route, $path);
                 return $this->executeController($info, $request, $uri_params);
             }
-
         }
     }
 
@@ -56,13 +59,14 @@ class Router{
         // Combine both arrays as key => value pairs.
         // And reduce the array to parameter matches e.g. id => 1 (without leading :)
         $params = array_combine($keys, $values);
-        foreach ($params as $key => $value){
-            if (strpos($key, ':') === 0 ){
-                $params[trim($key, ':')] = $value;
+        $sanitized_params = [];
+        foreach ($params as $param_name => $param_value){
+            if (strpos($param_name, ':') === 0 ){
+                $param_name = trim($param_name, ':');
+                $sanitized_params[$param_name] = $this->sanitizeParam($param_name, $param_value);
             }
-            unset($params[$key]);
         }
-        return $params;
+        return $sanitized_params;
     }
 
     /**
@@ -104,6 +108,30 @@ class Router{
         // Return regex pattern.
         return "/$route/";
 
+    }
+
+    private function sanitizeParam( string $name, string $value){
+        $type = $this->configured_params[$name];
+        switch ($type){
+            case 'int':
+                return (int) filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+                break;
+            case 'str':
+                return filter_var($value, FILTER_SANITIZE_STRING);
+                break;
+        }
+    }
+
+    private function getConfiguredParams() : array{
+        $array = [];
+        foreach ($this->routes as $name => $info){
+            foreach ($info as $key => $value){
+               if($key == 'params'){ 
+                   $array += $value;
+               }
+            }
+        }
+        return $array;
     }
 
 }

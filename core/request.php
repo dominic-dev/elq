@@ -17,10 +17,12 @@ class Request{
     }
 
     public function getParams(): array {
+        // TODO filter
         return $this->params;
     }
 
     public function getCookies(): array {
+        // TODO filter
         return $this->cookies;
     }
 

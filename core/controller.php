@@ -10,6 +10,11 @@ use Twig_Loader_Filesystem;
 require_once('helpers.php');
 
 class Controller{
+    public $request;
+    public $db;
+
+    // Name of the (child) class.
+    protected $parsed_classname;
 
     public function __construct(Request $request){
         $this->request = $request;

@@ -2,6 +2,7 @@
 
 use Elastique\App\Book;
 use Elastique\Core\Database;
+use Elastique\Core\Request;
 
 function autoload($classname){
     $namespaces = explode('\\', $classname);
@@ -23,9 +24,10 @@ spl_autoload_register('autoload');
 $book = new Book();
 //$book->new('LOTRO');
 //$book->save();
-$b = $book->get(21);
-var_dump($b->search('dominic'));
-$a = $b->getAuthor();
+$b = $book->get(1);
+$r = new Request();
+$p = $r->getParams();
+//$a = $b->getAuthor();
 //$b->title = 'sloenk';
 //$b->save();
 //var_dump($b);

@@ -1,14 +1,20 @@
 <?php
 
 namespace Elastique\Core;
+
 use Elastique\Core\Config;
-require('config.php');
 
 use PDO;
+
+require('config.php');
+
 
 class Database{
     private static $instance;
 
+    /**
+     * Connect to database.
+     */
     public static function conn(){
         $environment = Config::get('environment');
         $db_settings = Config::get("db-$environment");

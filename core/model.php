@@ -3,11 +3,13 @@
 namespace Elastique\Core;
 
 use Elastique\Core\Database;
+
 require_once('helpers.php');
 
 abstract class Model{
-    protected $db;
     public $pluralize;
+
+    protected $db;
     protected $full_classname;
     protected $short_classname;
 
