@@ -18,29 +18,15 @@ class Publisher extends Model{
 
     public function get($id){
         $query = 'select * from publishers where publisher_id = :id';
-        $sth = $this->db->prepare($query);
-        $sth->bindParam('id', $id, PDO::PARAM_INT);
-        $sth->execute();
-        $data = $sth->fetch();
-        if ($data == false){
-            throw new NotFound('Publisher not found.');
-        }
-        return $this->factory($data);
+        $options['params'] = ['id', $id, PDO::PARAM_INT];
+        return $this->fetch($query, $options);
     }
 
     public function getAll() : array {
         $query = <<<SQL
 select * from publishers 
 SQL;
-        $sth = $this->db->prepare($query);
-        $sth->execute();
-        $rows = $sth->fetchAll();
-        $array = [];
-        foreach ($rows as $key => $value){
-            $obj = $this->factory($value);
-            array_push($array, $obj);
-        }
-        return $array;
+        return $this->fetchAll();
     }
 
     public function new($data){
@@ -61,27 +47,27 @@ SQL;
 insert into publishers (name)
 values (:name)
 SQL;
-        $sth = $this->db->prepare($query);
-        $sth->bindValue('name', $this->name);
+        $options['values'] = ['name', $this->name];
+        $sth = $this->db->prepareStatement($query);
         $sth->execute();
-    }
-
-    private function factory($data){
-        $obj = new Publisher();
-        $obj->id = $data['publisher_id'];
-        $obj->name = $data['name'];
-        return $obj;
     }
 
     private function update(){
         $query = <<<SQL
 update publishers set name = :name where publisher_id = :id
 SQL;
-        $sth = $this->db->prepare($query);
-        $sth->bindValue('name', $this->name);
-        $sth->bindValue('id', $this->id);
+        $options['values'] = array(
+            ['name', $this->name].
+            ['id', $this->id]
+        );
+        $sth = $this->db->prepareStatement($query, $options);
         $sth->execute();    
     }
 
-
+    protected function factory(array $data){
+        $obj = new Publisher();
+        $obj->id = $data['publisher_id'];
+        $obj->name = $data['name'];
+        return $obj;
+    }
 }

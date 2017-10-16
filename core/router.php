@@ -92,7 +92,7 @@ class Router{
      *
      * @return (string) regex pattern.
      */
-    
+
     private function getPattern(string $route, array $route_params=null): string {
         // Escape slashes.
         $route = str_replace('/', '\/', $route);
@@ -110,6 +110,15 @@ class Router{
 
     }
 
+    /**
+     * Take a paramater from URI and sanitize it's value.
+     *
+     * @param name (string) the name of the param
+     * @param value (string) the value to sanitize
+     *
+     * @return mixed
+     */
+    
     private function sanitizeParam( string $name, string $value){
         $type = $this->configured_params[$name];
         switch ($type){
@@ -122,6 +131,10 @@ class Router{
         }
     }
 
+    /**
+     * Get all configured params from routes.
+     */
+    
     private function getConfiguredParams() : array{
         $array = [];
         foreach ($this->routes as $name => $info){

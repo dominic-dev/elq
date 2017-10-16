@@ -9,7 +9,7 @@ use Twig_Environment;
 use Twig_Loader_Filesystem;
 require_once('helpers.php');
 
-class Controller{
+abstract class Controller{
     public $request;
     public $db;
 

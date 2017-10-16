@@ -19,30 +19,17 @@ class Author extends Model{
 
     public function get($id){
         $query = 'select * from authors where author_id = :id';
-        $sth = $this->db->prepare($query);
-        $sth->bindParam('id', $id, PDO::PARAM_INT);
-        $sth->execute();
-        $data = $sth->fetch();
-        if ($data == false){
-            throw new NotFound('Author not found.');
-        }
-        return $this->factory($data);
+        $options['params'] = ['id', $id, PDO::PARAM_INT];
+        return $this->fetch($query, $options);
     }
 
     public function getAll() : array {
         $query = <<<SQL
 select * from authors 
 SQL;
-        $sth = $this->db->prepare($query);
-        $sth->execute();
-        $rows = $sth->fetchAll();
-        $array = [];
-        foreach ($rows as $key => $value){
-            $obj = $this->factory($value);
-            array_push($array, $obj);
-        }
-        return $array;
+        return $this->fetchAll($query);
     }
+
     public function new($data){
         return $this->factory($data);
     }
@@ -61,30 +48,33 @@ SQL;
 insert into authors (first_name, last_name)
 values (:first_name, :last_name)
 SQL;
-        $sth = $this->db->prepare($query);
-        $sth->bindValue('first_name', $this->first_name);
-        $sth->bindValue('last_name', $this->last_name);
+        $options['values'] = array(
+            ['first_name', $this->first_name],
+            ['last_name', $this->last_name]
+        );
+        $sth = $this->db->prepareStatement($query, $options);
         $sth->execute();
-    }
-
-    private function factory($data){
-        $obj = new Author();
-        $obj->id = $data['author_id'];
-        $obj->first_name = $data['first_name'];
-        $obj->last_name = $data['last_name'];
-        return $obj;
     }
 
     private function update(){
         $query = <<<SQL
 update authors set first_name = :first_name, last_name = :last_name where author_id = :id
 SQL;
-        $sth = $this->db->prepare($query);
-        $sth->bindValue('first_name', $this->first_name);
-        $sth->bindValue('last_name', $this->last_name);
-        $sth->bindValue('id', $this->id);
+        $options['values'] = array(
+            ['first_name', $this->first_name],
+            ['last_name', $this->last_name],
+            ['id', $this->id]
+        );
+        $sth = $this->db->prepareStatement($query, $options);
         $sth->execute();    
     }
 
+    protected function factory(array $data){
+        $obj = new Author();
+        $obj->id = $data['author_id'];
+        $obj->first_name = $data['first_name'];
+        $obj->last_name = $data['last_name'];
+        return $obj;
+    }
 
 }

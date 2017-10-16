@@ -1,6 +1,7 @@
 <?php
 
 use Elastique\App\Book;
+use Elastique\App\Author;
 use Elastique\Core\Database;
 use Elastique\Core\Request;
 
@@ -21,14 +22,19 @@ function autoload($classname){
 
 spl_autoload_register('autoload');
 
-$book = new Book();
-//$book->new('LOTRO');
-//$book->save();
-$b = $book->get(1);
-$r = new Request();
-$p = $r->getParams();
+//$author = new Author();
+//$author->first_name = 'piet';
+//$author->last_name = 'hein';
+//$author->save();
+//$b = new Book();
+//$b = $book->get(1);
+//$r = new Request();
+//$p = $r->getParams();
 //$a = $b->getAuthor();
-//$b->title = 'sloenk';
+//$b->title = 'De Kast met Veren';
+//$b->author_id = 1;
+//$b->publisher_id = 2;
+//$b->save();
 //$b->save();
 //var_dump($b);
 //$data = ['title' => 'klak'];
