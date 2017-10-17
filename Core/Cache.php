@@ -66,7 +66,7 @@ class Cache{
      * @return boolean True if caching is enabled, false if it is not.
      */
     
-    public static function isEnabled() : boolean {
+    public static function isEnabled() : bool {
         if (Config::get('cache') == 1){
             return true;
         }

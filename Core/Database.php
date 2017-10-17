@@ -10,7 +10,6 @@ require('Config.php');
 
 
 class Database{
-    private static $instance;
 
     /**
      * Connect to database.

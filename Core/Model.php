@@ -82,7 +82,7 @@ abstract class Model{
     
     public function fetchAll(string $query, array $options=null, bool $cache=true){
         $cache_key = $this->short_classname . '_all_' . md5(json_encode([$query, $options]));
-        if ($cache == true && Cache::exists($cache_key)){
+        if ($cache == true && Cache::isEnabled() && Cache::exists($cache_key)){
             return Cache::fetch($cache_key);
         }
         $sth = $this->db->prepareStatement($query, $options);
@@ -120,7 +120,7 @@ abstract class Model{
      */
     public function fetch(string $query, array $options=null){
         $cache_key = $this->short_classname . '_row_' . md5(json_encode([$query, $options]));
-        if (Cache::exists($cache_key)){
+        if (Cache::isEnabled() && Cache::exists($cache_key)){
             return Cache::fetch($cache_key);
         }
         $result = $this->fetchAll($query, $options, false);
