@@ -4,11 +4,8 @@
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/Core/Helpers.php';
 
-use Elastique\App\Models\Book;
-use Elastique\Core\Database;
-use Elastique\Core\Request;
 use Elastique\Core\Router;
-use Elastique\Core\Controller;
+use Elastique\Core\Request;
 
 // Load twig.
 $loader = new Twig_Loader_Filesystem(__DIR__ . '/App/views');
