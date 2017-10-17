@@ -2,9 +2,9 @@
 
 // load Comopser
 require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/core/helpers.php';
+require_once __DIR__ . '/Core/Helpers.php';
 
-use Elastique\App\Book;
+use Elastique\App\Models\Book;
 use Elastique\Core\Database;
 use Elastique\Core\Request;
 use Elastique\Core\Router;
@@ -35,10 +35,10 @@ function autoload($classname){
 }
 
 // Autoload classes.
-spl_autoload_register('autoload');
+//spl_autoload_register('autoload');
 
 // Load twig.
-$loader = new Twig_Loader_Filesystem(__DIR__ . '/app/views');
+$loader = new Twig_Loader_Filesystem(__DIR__ . '/App/views');
 $twig = new Twig_Environment($loader);
 
 $router = new Router();

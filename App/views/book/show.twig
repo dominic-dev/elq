@@ -1,0 +1,5 @@
+<h1>Book:show</h1>
+
+<p>Title: {{ book.title }}</p>
+<p>Auhor: <a href="/authors/{{ book.author.id }}">{{ book.author.first_name}} {{book.author.last_name }}</a></p>
+<p>Publisher: <a href="/publishers/{{ book.publisher.id }}">{{ book.publisher.name }}</a></p>
