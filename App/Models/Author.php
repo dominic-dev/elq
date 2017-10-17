@@ -61,43 +61,6 @@ SQL;
         parent::save($query, $options);
     }
 
-    /*
-    public function save(){
-        if (isset($this->id)){
-            $this->update();
-        }
-        else{
-            $this->create();
-        }
-    }
-
-    private function create(){
-        $query = <<<SQL
-insert into authors (first_name, last_name)
-values (:first_name, :last_name)
-SQL;
-        $options['values'] = array(
-            ['first_name', $this->first_name],
-            ['last_name', $this->last_name]
-        );
-        $sth = $this->db->prepareStatement($query, $options);
-        $sth->execute();
-    }
-
-    private function update(){
-        $query = <<<SQL
-update authors set first_name = :first_name, last_name = :last_name where author_id = :id
-SQL;
-        $options['values'] = array(
-            ['first_name', $this->first_name],
-            ['last_name', $this->last_name],
-            ['id', $this->id]
-        );
-        $sth = $this->db->prepareStatement($query, $options);
-        $sth->execute();    
-    }
-*/
-
     protected function factory(array $data){
         $obj = new Author();
         $obj->id = $data['author_id'];
