@@ -11,7 +11,6 @@ require_once('Helpers.php');
 
 abstract class Controller{
     public $request;
-    public $db;
 
     // Name of the (child) class.
     protected $parsed_classname;
@@ -19,7 +18,6 @@ abstract class Controller{
     public function __construct(Request $request){
         $this->request = $request;
         $this->parsed_classname = parse_classname(get_class($this));
-        $this->db = Database::conn();
 
         // Init function
         if (method_exists($this, 'init')){
