@@ -1,4 +1,8 @@
 {
+    "" : {
+        "controller" : "Welcome",
+        "method" : "index"
+    },
     "books/:id" : {
         "controller" : "Book",
         "method" : "show",
