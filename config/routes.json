@@ -1,8 +1,4 @@
 {
-    "" : {
-        "controller" : "Welcome",
-        "method" : "index"
-    },
     "books/:id" : {
         "controller" : "Book",
         "method" : "show",
@@ -76,6 +72,9 @@
             "id" : "int"
         }
 
+    },
+    "" : {
+        "controller" : "Welcome",
+        "method" : "index"
     }
-
 }
