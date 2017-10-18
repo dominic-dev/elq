@@ -6,9 +6,6 @@ use Elastique\Core\Database;
 use Elastique\Core\Config;
 use Elastique\Core\Cache;
 
-use PDO;
-use APCUIterator;
-
 require_once('Helpers.php');
 
 abstract class Model{
