@@ -13,8 +13,8 @@ require_once('Helpers.php');
 
 abstract class Model{
     public $pluralize;
+    public $db;
 
-    protected $db;
     protected $full_classname;
     protected $short_classname;
 
@@ -33,8 +33,31 @@ abstract class Model{
         $this->db = new Database();
     }
 
+
+    /**
+     * Prepare object for serialization for cache.
+     */
+    
+    public function __sleep(){
+        $properties = get_object_vars($this);
+        // Unset database connection.
+        unset($properties['db']);
+        return array_keys($properties);
+    }
+
+    /**
+     * Restore object after deserialization from cache.
+     */
+    
+    public function __wakeup(){
+        // Restore connection.
+        $this->db = new Database();
+    }
+
+
     /**
      * Store model in database.
+     * Delete affected queries from cache.
      * 
      * @param query (string) The query to execute.
      * @param options (array) Valid options are
@@ -80,11 +103,12 @@ abstract class Model{
       *
       */
     
-    public function fetchAll(string $query, array $options=null, bool $cache=true){
-        $cache_key = $this->short_classname . '_all_' . md5(json_encode([$query, $options]));
+    public function fetchAll(string $query, array $options=null, bool $cache=true) : array {
+        $cache_key = $this->getCacheKey('all', $query, $options);
         if ($cache == true && Cache::isEnabled() && Cache::exists($cache_key)){
             return Cache::fetch($cache_key);
         }
+
         $sth = $this->db->prepareStatement($query, $options);
         $sth->execute();
         $rows = $sth->fetchAll();
@@ -118,15 +142,33 @@ abstract class Model{
      * @return object
      *
      */
+
     public function fetch(string $query, array $options=null){
-        $cache_key = $this->short_classname . '_row_' . md5(json_encode([$query, $options]));
+        $cache_key = $this->getCacheKey('row', $query, $options);
         if (Cache::isEnabled() && Cache::exists($cache_key)){
             return Cache::fetch($cache_key);
         }
+
         $result = $this->fetchAll($query, $options, false);
         $result = $result[0];
         Cache::store($cache_key, $result);
+
         return $result;
+    }
+
+    /**
+     * Take an identifier, a query and its options and return a string
+     * to be used as a key for caching.
+     *
+     * @param identifier (string) A string to organize keys by, e.g. 'row' or 'all'.
+     * @param query (string) The query.
+     * @param options (array) The options that were passed with the query.
+     *
+     * @return string The key to be used for caching.
+     */
+    
+    public function getCacheKey(string $identifier, string $query, array $options=null) : string {;
+        return $this->short_classname . '_' . $identifier . '_' . md5(json_encode([$query, $options]));
     }
 
     /**
@@ -136,9 +178,9 @@ abstract class Model{
      * @param options (array) The options that were passed with the query.
      */
     
-    protected function clearCache($query, $options){
+    protected function clearCache(string $query, array $options){
         Cache::deletePattern($this->short_classname . '_all_');
-        Cache::deleteKey(md5(json_encode([$query, $options])));
+        Cache::deleteKey($this->getCacheKey('row', $query, $options));
     }
 
     /**

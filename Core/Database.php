@@ -10,12 +10,19 @@ require('Config.php');
 
 
 class Database{
+    public $db;
+
+    public function __construct(){
+        $this->dbh = $this->conn();
+    }
 
     /**
      * Connect to database.
      */
-    public static function conn(){
-        $environment = Config::get('environment');
+    public function conn(string $environment=null){
+        if(!isset($environment)){
+            $environment = Config::get('environment');
+        }
         $db_settings = Config::get("db-$environment");
         if ($db_settings['driver'] == 'sqlite'){
             $connection_string = $db_settings["driver"] . ':' . __DIR__ . '/../db/' .  $db_settings["database"];
@@ -24,29 +31,28 @@ class Database{
     }
 
     /**
-        * Take a query and prepare it. Return statement handler.
-        *
-        * @param query (string) The query to execute.
-        * @param options (array) Valid options are
-        *   'limit' => (int),
-        *   'offset' => (int),
-        *   'params' => (array) Can be:
-        *       1. a one dimensional array with one paramater
-        *       containing (param_name, param_value, PDO::param_type)
-        *       2. a two dimensiona array containing an array of paramaters
-        *       as described in 1.
-        *   'values' => (array) Can be.
-        *       1. a one dimensional array with one value 
-        *       containing (value_name, value_value)
-        *       2. a two dimensiona array containing an array of values
-        *       as described in 1.
-        *
-        * @return PDOStatement Returns an array of objects.
-        *
+     * Take a query and prepare it. Return statement handler.
+     *
+     * @param query (string) The query to execute.
+     * @param options (array) Valid options are
+     *   'limit' => (int),
+     *   'offset' => (int),
+     *   'params' => (array) Can be:
+     *       1. a one dimensional array with one paramater
+     *       containing (param_name, param_value, PDO::param_type)
+     *       2. a two dimensiona array containing an array of paramaters
+     *       as described in 1.
+     *   'values' => (array) Can be.
+     *       1. a one dimensional array with one value 
+     *       containing (value_name, value_value)
+     *       2. a two dimensiona array containing an array of values
+     *       as described in 1.
+     *
+     * @return PDOStatement 
+     *
      */
     
     public function prepareStatement(string $query, array $options=null){
-        $db = $this->conn();
         if (isset($options['limit'])){
             $query .= ' LIMIT :limit'; 
             $options['params'] += ['limit', $options['limit'], PDO::PARAM_INT];
@@ -56,7 +62,7 @@ class Database{
                 $options['params'] += ['offset', $options['offset'], PDO::PARAM_INT];
             }
         }
-        $sth = $db->prepare($query);
+        $sth = $this->dbh->prepare($query);
         // bindParam
         if (isset($options['params'])){
             // A single param may be passed, wrap it in an array.

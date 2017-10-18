@@ -16,6 +16,7 @@ function split_class_name($class_name){
  * @return array Return array with full_classname, split_classname
  * short_classname, short_lower.
  */
+
 function parse_classname(string $classname) : array {
     $array = [];
     $array['full_classname'] = $classname;

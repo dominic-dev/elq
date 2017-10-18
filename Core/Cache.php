@@ -13,7 +13,7 @@ class Cache{
      */
 
     public static function fetch(string $key){
-        print('fetching from cache key ' . $key);
+        echo('fetching from cache key ' . $key . '<br />');
         return apcu_fetch($key);
     }
 

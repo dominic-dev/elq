@@ -5,5 +5,10 @@
     "db-development":{
         "driver" : "sqlite",
 		"database" : "database.sqlite3"
+    },
+
+    "db-test":{
+        "driver" : "sqlite",
+		"database" : "test.sqlite3"
     }
 }

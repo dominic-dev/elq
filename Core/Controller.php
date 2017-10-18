@@ -39,6 +39,7 @@ abstract class Controller{
      *
      * @return string The output to render.
      */
+
     protected function render(string $template, array $params=[], $directory=null) : string {
         // Render searches by default in the views/<model name>/ directory
         if(!isset($directory)){

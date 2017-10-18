@@ -44,6 +44,7 @@ extension = php_pdo_sqlite.dll
 
 ## Getting Started
 
+### Recommended
 Run
 
 ```

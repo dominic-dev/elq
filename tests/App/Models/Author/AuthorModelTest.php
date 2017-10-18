@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 class AuthorTest extends TestCase {
     public function setUp(){
         $this->model = new Author();
+        $this->model->db->dbh = $this->model->db->conn('test');
     }
     public function testName(){
         $author = $this->model->get(1);

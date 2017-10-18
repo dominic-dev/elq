@@ -9,6 +9,7 @@ class BookTest extends TestCase {
 
     public function setUp(){
         $this->model = new Book();
+        $this->model->db->dbh = $this->model->db->conn('test');
     }
     public function testTitle(){
         $book = $this->model->get(1);

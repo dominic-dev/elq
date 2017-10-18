@@ -10,7 +10,6 @@ class BookController extends Controller{
 
     protected function init(){
         $this->model = new Book();
-
     }
 
     public function featured(){
@@ -50,7 +49,6 @@ class BookController extends Controller{
 
     public function show(int $id){
         $book = $this->model->get($id);
-        //return $this->view->loadTemplate('/book/show.twig')->render(['book' => $book]);
         $params = ['book' => $book];
         return $this->render('show', $params);
     }

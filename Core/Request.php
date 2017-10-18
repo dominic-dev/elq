@@ -23,13 +23,17 @@ class Request{
      */
     
     public function getParams(): array {
+        // GET and POST are not used.
+        // Upon implementation they will be filtered.
         // TODO filter
-        return $this->params;
+        // return $this->params;
     }
 
     public function getCookies(): array {
+        // Cookies are not used.
+        // Upon implementation they will be filtered.
         // TODO filter
-        return $this->cookies;
+        // return $this->cookies;
     }
 
     public function getURL(): string {

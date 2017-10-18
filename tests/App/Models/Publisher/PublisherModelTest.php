@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 class PublisherTest extends TestCase {
     public function setUp(){
         $this->model = new Publisher();
+        $this->model->db->dbh = $this->model->db->conn('test');
     }
     public function testName(){
         $publisher = $this->model->get(1);

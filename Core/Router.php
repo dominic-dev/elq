@@ -32,7 +32,6 @@ class Router{
             $route_params = isset($info['params']) ? $info['params'] : null;
             // Get rexeg pattern
             $pattern = $this->getPattern($route, $route_params);
-            //$path = $request->getPath();
 
             if (preg_match($pattern, $path)){
                 // Extract params from uri.
@@ -51,21 +50,22 @@ class Router{
      * @return array The paramaters as key => value pairs.
      */
     
-    private function extractParams(string $route, string $path){
-        //str_replace('\\', '', $route);
+    private function extractParams(string $route, string $path) : array {
         // Compare the matched route pattern to the URI
         // e.g. books/:id to /books/1
         // Remove trailing and leading slashes and split by remaining slashes.
-        $keys = explode('/', trim($route, '/'));
-        $values = explode('/', trim($path, '/'));
+        $route_params = explode('/', trim($route, '/'));
+        $path_params = explode('/', trim($path, '/'));
         // Combine both arrays as key => value pairs.
-        // And reduce the array to parameter matches e.g. id => 1 (without leading :)
-        $params = array_combine($keys, $values);
+        // And reduce the array to parameter matches
+        // Parameter matches are sanitized.
+        $potential_params = array_combine($route_params, $path_params);
         $sanitized_params = [];
-        foreach ($params as $param_name => $param_value){
-            if (strpos($param_name, ':') === 0 ){
-                $param_name = trim($param_name, ':');
-                $sanitized_params[$param_name] = $this->sanitizeParam($param_name, $param_value);
+        foreach ($potential_params as $name => $value){
+            // Valid params start with a colon
+            if (strpos($name, ':') === 0 ){
+                $name = trim($name, ':');
+                $sanitized_params[$name] = $this->sanitizeParam($name, $value);
             }
         }
         return $sanitized_params;
@@ -80,7 +80,7 @@ class Router{
      * @return string The output to render.
      */
     
-    private function executeController(array $info, Request $request, array $uri_params=null){
+    private function executeController(array $info, Request $request, array $uri_params=null) : string {
         $controller_name = 'Elastique\App\Controllers\\' . $info['controller'] . 'Controller';
         $method = $info['method'];
 
@@ -100,7 +100,6 @@ class Router{
     private function getPattern(string $route, array $route_params=null): string {
         // Escape slashes.
         $route = str_replace('/', '\/', $route);
-
         // Replace :params in route with regex pattern according to type.
         if (isset($route_params)){
             foreach ($route_params as $name => $type){
@@ -138,7 +137,7 @@ class Router{
     /**
      * Get all configured params from routes.
      *
-     * @return array ALl parameters that are configured in config/routes.json
+     * @return array All parameters that are configured in config/routes.json
      */
     
     private function getConfiguredParams() : array{
