@@ -10,7 +10,7 @@ require('Config.php');
 
 
 class Database{
-    public $db;
+    public $dbh;
 
     public function __construct(){
         $this->dbh = $this->conn();
