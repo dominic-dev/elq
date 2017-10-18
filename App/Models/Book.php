@@ -121,11 +121,11 @@ SQL;
         $obj->featured = $data['featured'];
         if (isset($obj->author_id)){
             $author = new Author();
-            $obj->author = $author->get($data['author_id']);
+            $obj->author = $author->factory($data);
         }
         if (isset($obj->publisher_id)){
             $publisher = new Publisher();
-            $obj->publisher = $publisher->get($data['publisher_id']);
+            $obj->publisher = $publisher->factory($data);
 
         }
         return $obj;
