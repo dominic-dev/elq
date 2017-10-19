@@ -210,8 +210,8 @@ abstract class Model{
             foreach ($this->belongs_to as $key => $model_name){
                 $full_model_name = $this->_class_namespace . $model_name;
                 $model = new $full_model_name;
-                $foreign_key = strtolower($model_name) . '_id';
-                $table_name = strtolower($model_name) . 's';
+                $foreign_key = $model->_parsed_classname['short_lower'] . '_id';
+                $table_name = $model->_table_name;
                     $query .= " LEFT JOIN $table_name ON $this->_table_name.$foreign_key = $model->_table_name.$foreign_key";
             }
         }
