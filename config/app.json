@@ -1,5 +1,5 @@
 {
-    "cache" : 0,
+    "cache" : 1,
     "environment" : "development",
 
     "db-development":{
