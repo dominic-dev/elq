@@ -8,15 +8,8 @@ class Book extends Model{
 
     public function __construct() {
         $this->columns = array(
-            'title' => [
-                'type' => 'varchar(55)',
-                'not_null' => true
-            ],
-            'featured' => [
-                'type' => 'BIT',
-                'not_null' => true,
-                'default' => 0
-            ]
+            'title' => ['type' => 'varchar(55)', 'not_null' => true],
+            'featured' => ['type' => 'BIT', 'not_null' => true, 'default' => 0]
         );
         $this->belongs_to = array('Author', 'Publisher');
 
