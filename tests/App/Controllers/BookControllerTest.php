@@ -19,7 +19,7 @@ class BookControllerTest extends TestCase {
         $this->request = new TestRequest;
         $this->controller = new BookController($this->request);
         $this->model = new Book();
-        $this->model->db->dbh = $this->model->db->conn('test');
+        $this->model->_db->dbh = $this->model->_db->conn('test');
     }
 
     public function testFeatured()

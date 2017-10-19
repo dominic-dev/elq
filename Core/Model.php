@@ -6,28 +6,30 @@ use Elastique\Core\Database;
 use Elastique\Core\Config;
 use Elastique\Core\Cache;
 
+use PDO;
+
 require_once('Helpers.php');
 
 abstract class Model{
-    public $pluralize;
-    public $db;
+    public $id;
 
-    protected $full_classname;
-    protected $short_classname;
+    public $_db;
+    public $_plural;
 
-    abstract protected function factory(array $data);
+    protected $_full_classname;
+    protected $_parsed_classname;
+    protected $_class_namespace;
+    protected $_table_name;
 
     public function __construct($full_classname){
-        // Get last part of class name, and lowercase it.
-        $this->full_classname = $full_classname;
-        $split_class_name = split_class_name($full_classname);
-        $short_classname = array_pop($split_class_name);
-        $this->short_classname = strtolower($short_classname);
+        $this->_full_classname = $full_classname;
+        $this->_parsed_classname = parse_classname($full_classname);
+        $this->_class_namespace= str_replace($this->_parsed_classname['short_classname'], '', $this->_full_classname);
+        $this->_plural = $this->_parsed_classname['short_lower']. 's';
+        $this->_table_name = $this->_plural;
 
-        // Plural name of model
-        $this->pluralize = $this->short_classname . 's';
         // Connect to database
-        $this->db = new Database();
+        $this->_db = new Database();
     }
 
 
@@ -38,7 +40,7 @@ abstract class Model{
     public function __sleep(){
         $properties = get_object_vars($this);
         // Unset database connection.
-        unset($properties['db']);
+        unset($properties['_db']);
         return array_keys($properties);
     }
 
@@ -48,34 +50,44 @@ abstract class Model{
     
     public function __wakeup(){
         // Restore connection.
-        $this->db = new Database();
+        $this->_db = new Database();
     }
 
-
     /**
-     * Store model in database.
-     * Delete affected queries from cache.
-     * 
-     * @param query (string) The query to execute.
-     * @param options (array) Valid options are
-     *   'limit' => (int),
-     *   'offset' => (int),
-     *   'params' => (array) Can be:
-     *       1. a one dimensional array with one paramater
-     *       containing (param_name, param_value, PDO::param_type)
-     *       2. a two dimensiona array containing an array of paramaters
-     *       as described in 1.
-     *   'values' => (array) Can be.
-     *       1. a one dimensional array with one value 
-     *       containing (value_name, value_value)
-     *       2. a two dimensiona array containing an array of values
-     *       as described in 1.
+     * Take a data row from the database and return it as object.
+     *
+     * @param data (array) The data row from the database.
+     *
+     * @return mixed The data row as object.
      */
     
-    public function save(string $query, array $options){
-        $sth = $this->db->prepareStatement($query, $options);
-        $sth->execute();
-        $this->clearCache($query, $options);
+    protected function factory(array $data) {
+        // Instantiate the model
+        $obj =  new $this->_full_classname;
+
+        // The convention for keys in the database is <model name>_id,
+        // set it as property 'id'
+        $obj->id = $data["{$this->_parsed_classname['short_lower']}_id"];
+
+        // Set the data columns as object properties.
+        foreach ($this->columns as $name => $info){
+           $obj->$name = $data[$name];
+        }
+
+        // Belongs to relationships
+        if (isset($this->belongs_to)){
+            $this->belongs_to = is_array($this->belongs_to) ? $this->belongs_to : array($this->belongs_to);
+
+            foreach ($this->belongs_to as $key => $model_name ){
+                $model_name_full = $this->_class_namespace . $model_name;
+                // Instantiate foreign model.
+                $model = new $model_name_full;
+                // Load the data as an object and store it as a property of the main model.
+                $obj->{$model->_parsed_classname['short_lower']} = $model->factory($data);
+            }
+            
+        }
+        return $obj;
     }
 
     /**
@@ -106,7 +118,7 @@ abstract class Model{
             return Cache::fetch($cache_key);
         }
 
-        $sth = $this->db->prepareStatement($query, $options);
+        $sth = $this->_db->prepareStatement($query, $options);
         $sth->execute();
         $rows = $sth->fetchAll();
         $result = $this->rowsToObjects($rows);
@@ -154,6 +166,59 @@ abstract class Model{
     }
 
     /**
+     * Take an id. Return the row from the database with that id, as object.
+     *
+     * @param id (int) The id of the row.
+     *
+     * @return object The object from the database.
+     */
+    
+    public function get(int $id){
+        $query = $this->getAllQuery();
+        $query .= " WHERE {$this->_parsed_classname['short_lower']}_id = :id";
+        $options = array(
+            'params' => ['id', $id, PDO::PARAM_INT]
+        );
+        return $this->fetch($query, $options); 
+
+    }
+
+    /**
+     * Return all rows from the database as objects.
+     *
+     * @return array The array with all the rows as objects from the database.
+     */
+
+    public function getAll(){;
+        $query = $this->getAllQuery();
+        return $this->fetchAll($query); 
+
+    }
+    
+    /**
+     * Create the query string to get all rows, with relationships.
+     *
+     * @return string The query.
+     */
+    
+    public function getAllQuery() : string {
+        $query = 'SELECT * FROM ' . $this->_table_name;
+
+        // Belongs to relationship
+        if(isset($this->belongs_to)){
+            $this->belongs_to = is_array($this->belongs_to) ? $this->belongs_to : array($this->belongs_to);
+            foreach ($this->belongs_to as $key => $model_name){
+                $full_model_name = $this->_class_namespace . $model_name;
+                $model = new $full_model_name;
+                $foreign_key = strtolower($model_name) . '_id';
+                $table_name = strtolower($model_name) . 's';
+                    $query .= " LEFT JOIN $table_name ON $this->_table_name.$foreign_key = $model->_table_name.$foreign_key";
+            }
+        }
+        return $query;
+    }
+
+    /**
      * Take an identifier, a query and its options and return a string
      * to be used as a key for caching.
      *
@@ -165,8 +230,83 @@ abstract class Model{
      */
     
     public function getCacheKey(string $identifier, string $query, array $options=null) : string {;
-        return $this->short_classname . '_' . $identifier . '_' . md5(json_encode([$query, $options]));
+        return $this->_parsed_classname['short_lower'] . '_' . $identifier . '_' . md5(json_encode([$query, $options]));
     }
+
+    /**
+     * Store model in database.
+     * Delete affected queries from cache.
+     * 
+     * @param query (string) The query to execute.
+     * @param options (array) Valid options are
+     *   'limit' => (int),
+     *   'offset' => (int),
+     *   'params' => (array) Can be:
+     *       1. a one dimensional array with one paramater
+     *       containing (param_name, param_value, PDO::param_type)
+     *       2. a two dimensiona array containing an array of paramaters
+     *       as described in 1.
+     *   'values' => (array) Can be.
+     *       1. a one dimensional array with one value 
+     *       containing (value_name, value_value)
+     *       2. a two dimensiona array containing an array of values
+     *       as described in 1.
+     */
+    
+    public function save(string $query, array $options){
+        if (isset($this->id)){
+            $this->update($query, $options);
+        }
+        else{
+            $this->create($query, $options);
+        }
+        $this->clearCache($query, $options);
+    }
+
+    /**
+     * Take a string, and search the model in the database for soft matches.
+     *
+     * @return array The array of: rows that match the search string, as objects.
+     *
+     */
+    
+    public function search($search_string, int $offset=null, int $limit=null) : array {
+        // Wildcards
+        $search_string = '%' . $search_string . '%';
+        $query = $this->getAllQuery();
+
+        $query .= ' WHERE ';
+        foreach ($this->columns as $name=> $info){
+            $query .= " $this->_table_name.$name LIKE :search_string OR ";
+        }
+        // Belongs to relationship
+        if(isset($this->belongs_to)){
+            $this->belongs_to = is_array($this->belongs_to) ? $this->belongs_to : array($this->belongs_to);
+            foreach ($this->belongs_to as $key => $model_name){
+                $full_model_name = $this->_class_namespace . $model_name;
+                $model = new $full_model_name;
+                foreach ( $model->columns as $name=> $info){
+                    $query .= " $model->_table_name.$name LIKE :search_string OR ";
+                }
+            }
+        }
+
+        // Remove the last or if necessary.
+        if (substr($query, -3) == 'OR '){
+            $query = substr($query, 0, -3);
+        }
+
+        $options = array(
+            'params' => ['search_string', $search_string, PDO::PARAM_STR],
+            'limit' => $limit,
+            'offset' => $offset
+        
+        );
+
+        return $this->fetchAll($query, $options);
+    }
+
+
 
     /**
      * Clear the cache for the data that is affected by query.

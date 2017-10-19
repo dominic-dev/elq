@@ -13,7 +13,7 @@ class PublisherControllerTest extends TestCase {
         $this->request = new TestRequest;
         $this->controller = new PublisherController($this->request);
         $this->model = new Publisher();
-        $this->model->db->dbh = $this->model->db->conn('test');
+        $this->model->_db->dbh = $this->model->_db->conn('test');
     }
 
     public function testShow(){;

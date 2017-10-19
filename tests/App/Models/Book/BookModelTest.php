@@ -9,7 +9,7 @@ class BookTest extends TestCase {
 
     public function setUp(){
         $this->model = new Book();
-        $this->model->db->dbh = $this->model->db->conn('test');
+        $this->model->_db->dbh = $this->model->_db->conn('test');
     }
     public function testTitle(){
         $book = $this->model->get(1);
@@ -39,6 +39,11 @@ class BookTest extends TestCase {
     public function testSearch(){
         $result = $this->model->search('of');
         $this->assertSame(count($result), 9);
+    }
+
+    public function testSearchOffsetLimit(){
+        $result = $this->model->search('of', 0, 2);
+        $this->assertSame(count($result), 2);
     }
 
 }

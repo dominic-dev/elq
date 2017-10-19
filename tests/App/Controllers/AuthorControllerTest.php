@@ -13,7 +13,7 @@ class AuthorControllerTest extends TestCase {
         $this->request = new TestRequest;
         $this->controller = new AuthorController($this->request);
         $this->model = new Author();
-        $this->model->db->dbh = $this->model->db->conn('test');
+        $this->model->_db->dbh = $this->model->_db->conn('test');
     }
 
     public function testShow(){;
@@ -31,7 +31,6 @@ class AuthorControllerTest extends TestCase {
         $this->assertSame(substr_count($result, 'data-model="author"'), 5);
 
     }
-
 
 }
 

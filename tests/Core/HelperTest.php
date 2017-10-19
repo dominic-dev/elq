@@ -11,24 +11,17 @@ class HelperTest extends TestCase {
         $this->classname = 'Elastique\App\Models\Book';
     }
 
-    public function testSplitClassname(){;
-        $result = split_class_name($this->classname);
-        $this->assertSame($result, ['Elastique', 'App', 'Models', 'Book']);
-        
-    }
-
     public function testParseClassname(){;
         $result = parse_classname($this->classname);
         $expected = array(
             'full_classname' => $this->classname,
-            'split_classname' => split_class_name($this->classname),
+            'split_classname' => explode('\\', $this->classname),
             'short_classname' => 'Book',
             'short_lower' => 'book'
                 );
         $this->assertSame($result, $expected);
         
     }
-
 }
 
 ?>

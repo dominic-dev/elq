@@ -1,14 +1,6 @@
 <?php 
 
 /**
- * Take class name. Return class name split by \
- */
-
-function split_class_name($class_name){
-    return explode('\\', $class_name);
-}
-
-/**
  * Take classname, return array.
  *
  * @param classname (string) The classname to parse.

@@ -53,16 +53,21 @@ class Database{
      */
     
     public function prepareStatement(string $query, array $options=null){
+        // Limit
         if (isset($options['limit'])){
+            $options['values'] = isset($options['values']) ? $options['values'] : [];
             $query .= ' LIMIT :limit'; 
-            $options['params'] += ['limit', $options['limit'], PDO::PARAM_INT];
+            array_push($options['values'], ['limit', $options['limit'], PDO::PARAM_INT]);
 
+            // Offset
             if (isset($options['offset'])){
                 $query .= ' OFFSET :offset';
-                $options['params'] += ['offset', $options['offset'], PDO::PARAM_INT];
+                array_push($options['values'], ['offset', $options['offset'], PDO::PARAM_INT]);
             }
         }
+
         $sth = $this->dbh->prepare($query);
+
         // bindParam
         if (isset($options['params'])){
             // A single param may be passed, wrap it in an array.
@@ -77,10 +82,9 @@ class Database{
         if (isset($options['values'])){
             // A single value may be passed, wrap it in an array.
             $options['values'] = is_array($options['values'][0]) ? $options['values'] : array($options['values']);
-            var_dump($options['values']);
             foreach ($options['values'] as $key => $array){
-                list($name, $value) = $array;
-                $sth->bindValue($name, $value);
+                list($name, $value, $type) = $array;
+                $sth->bindValue($name, $value, $type);
             }
         }
         return $sth;
