@@ -192,7 +192,6 @@ abstract class Model{
     public function getAll(){;
         $query = $this->getAllQuery();
         return $this->fetchAll($query); 
-
     }
     
     /**
@@ -211,8 +210,7 @@ abstract class Model{
                 $full_model_name = $this->_class_namespace . $model_name;
                 $model = new $full_model_name;
                 $foreign_key = $model->_parsed_classname['short_lower'] . '_id';
-                $table_name = $model->_table_name;
-                    $query .= " LEFT JOIN $table_name ON $this->_table_name.$foreign_key = $model->_table_name.$foreign_key";
+                $query .= " LEFT JOIN $model->_table_name ON $this->_table_name.$foreign_key = $model->_table_name.$foreign_key";
             }
         }
         return $query;
@@ -255,9 +253,11 @@ abstract class Model{
     
     public function save(string $query, array $options){
         if (isset($this->id)){
+            // TODO
             $this->update($query, $options);
         }
         else{
+            // TODO
             $this->create($query, $options);
         }
         $this->clearCache($query, $options);
@@ -291,7 +291,7 @@ abstract class Model{
             }
         }
 
-        // Remove the last or if necessary.
+        // Remove the last 'OR ' if necessary.
         if (substr($query, -3) == 'OR '){
             $query = substr($query, 0, -3);
         }
