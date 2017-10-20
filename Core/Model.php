@@ -79,9 +79,8 @@ abstract class Model{
             $this->belongs_to = is_array($this->belongs_to) ? $this->belongs_to : array($this->belongs_to);
 
             foreach ($this->belongs_to as $key => $model_name ){
-                $model_name_full = $this->_class_namespace . $model_name;
                 // Instantiate foreign model.
-                $model = new $model_name_full;
+                $model = $this->getModel($model_name);
                 // Load the data as an object and store it as a property of the main model.
                 $obj->{$model->_parsed_classname['short_lower']} = $model->factory($data);
             }
@@ -207,8 +206,8 @@ abstract class Model{
         if(isset($this->belongs_to)){
             $this->belongs_to = is_array($this->belongs_to) ? $this->belongs_to : array($this->belongs_to);
             foreach ($this->belongs_to as $key => $model_name){
-                $full_model_name = $this->_class_namespace . $model_name;
-                $model = new $full_model_name;
+                // Instantiate foreign model
+                $model = $this->getModel($model_name);
                 $foreign_key = $model->_parsed_classname['short_lower'] . '_id';
                 $query .= " LEFT JOIN $model->_table_name ON $this->_table_name.$foreign_key = $model->_table_name.$foreign_key";
             }
@@ -229,6 +228,19 @@ abstract class Model{
     
     public function getCacheKey(string $identifier, string $query, array $options=null) : string {;
         return $this->_parsed_classname['short_lower'] . '_' . $identifier . '_' . md5(json_encode([$query, $options]));
+    }
+
+    /**
+     * Take a model name, return instantiated model.
+     *
+     * @param name (string) The name of the model to instantiate, without the namespace.
+     *
+     * @return mixed The instantiated model.
+     */
+    
+    public function getModel(string $name){
+        $full_model_name = $this->_class_namespace . $name;
+        return new $full_model_name;
     }
 
     /**
@@ -283,8 +295,8 @@ abstract class Model{
         if(isset($this->belongs_to)){
             $this->belongs_to = is_array($this->belongs_to) ? $this->belongs_to : array($this->belongs_to);
             foreach ($this->belongs_to as $key => $model_name){
-                $full_model_name = $this->_class_namespace . $model_name;
-                $model = new $full_model_name;
+                // Instantiate foreign model
+                $model = $this->getModel($model_name);
                 foreach ( $model->columns as $name=> $info){
                     $query .= " $model->_table_name.$name LIKE :search_string OR ";
                 }
@@ -302,7 +314,6 @@ abstract class Model{
             'offset' => $offset
         
         );
-
         return $this->fetchAll($query, $options);
     }
 
